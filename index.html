@@ -1,0 +1,2572 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance EEE</title>
+    <!-- Tailwind CSS CDN for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter for attractive typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Apply Inter font family to the entire body and ensure smooth scrolling */
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        /* Styling for active tab, making it visually distinct */
+        .tab-active {
+            background-color: #6d28d9; /* Deep purple */
+            color: white;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+            border-bottom: 3px solid #f97316; /* Orange accent */
+        }
+
+
+        /* Custom shadow for a premium feel */
+        .shadow-custom-lg {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 5px rgba(0, 0, 0, 0.05) inset;
+        }
+
+
+        /* Hide content sections by default until a tab is clicked */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+
+        /* Style for scrollable tables and announcement feed */
+        .table-container, .announcement-feed {
+            max-height: 400px; /* Adjust as needed */
+            overflow-y: auto;
+            border-radius: 0.75rem; /* rounded-xl */
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+            padding: 1rem;
+        }
+
+
+        /* Enhanced button styles */
+        .btn-primary {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            font-weight: 700; /* font-bold */
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #2563eb; /* blue-600 */
+        }
+        .btn-primary:hover {
+            background-color: #2563eb; /* blue-600 */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+
+        .btn-success {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+            font-weight: 700;
+            padding: 0.5rem 1rem; /* py-2 px-4 */
+            border-radius: 0.375rem; /* rounded-md */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #16a34a; /* green-600 */
+        }
+        .btn-success:hover {
+            background-color: #16a34a; /* green-600 */
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+
+        .btn-secondary {
+            background-color: #a855f7; /* purple-500 */
+            color: white;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #9333ea; /* purple-600 */
+        }
+        .btn-secondary:hover {
+            background-color: #9333ea; /* purple-600 */
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+
+        .btn-danger {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #dc2626; /* red-600 */
+        }
+        .btn-danger:hover {
+            background-color: #dc2626; /* red-600 */
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+
+
+
+        /* Loading spinner */
+        .loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #3b82f6; /* Blue */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        /* Modal specific styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        .warning-text {
+            color: #f59e0b; /* amber-500 */
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Login Page Container -->
+    <div id="loginPage" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-purple-700 p-4">
+        <div class="bg-white p-8 md:p-12 rounded-2xl shadow-custom-lg w-full max-w-md text-center">
+            <h1 class="text-4xl font-extrabold text-gray-800 mb-6">Attendance EEE</h1>
+            <p class="text-xl font-semibold text-gray-600 mb-8">Login to continue</p>
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <input type="email" id="email" placeholder="Email" required
+                        class="w-full px-5 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-lg">
+                </div>
+                <div>
+                    <input type="password" id="password" placeholder="Password" required
+                        class="w-full px-5 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-lg">
+                </div>
+                <button type="submit" class="w-full btn-primary text-lg">
+                    Login
+                </button>
+                <!-- Login message will stay for 5 seconds for better debugging -->
+                <div id="loginMessage" class="mt-4 text-red-600 font-medium"></div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Main Application Container (Hidden by default) -->
+    <div id="mainApp" class="hidden flex-1 flex flex-col">
+        <!-- Header for Main Application -->
+        <header class="bg-gradient-to-r from-blue-700 to-purple-800 text-white shadow-xl py-6 px-4">
+            <div class="container mx-auto text-center flex flex-col sm:flex-row justify-between items-center">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Government Polytechnic College, Pala</h1>
+                    <h2 class="text-2xl md:text-3xl font-semibold mt-2">Dept. of Electrical and Electronics Engineering</h2>
+                    <h3 class="text-xl md:text-2xl font-medium mt-1">Attendance Register Log</h3>
+                    <p class="text-sm text-gray-300 mt-2">Logged in as User ID: <span id="displayUserId">Loading...</span>, Semester: <span id="displaySemester">N/A</span></p>
+                </div>
+                <div class="flex items-center space-x-4 mt-4 sm:mt-0">
+                    <!-- Semester Selector -->
+                    <label for="semesterSelect" class="font-bold text-lg">Semester:</label>
+                    <select id="semesterSelect" class="px-3 py-2 rounded-md bg-white text-gray-800 font-semibold shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                    </select>
+                    <!-- Logout Button -->
+                    <button id="logoutButton" class="btn-danger px-6 py-2">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+
+        <!-- Horizontal Tabs Navigation -->
+        <nav class="bg-purple-700 shadow-md">
+            <div class="container mx-auto px-4 py-3 flex flex-wrap justify-center space-x-2 md:space-x-4">
+                <button class="tab-button text-white font-semibold py-2 px-6 rounded-full transition-all duration-200 hover:bg-purple-600 active-tab" data-tab="studentList">Student List</button>
+                <button class="tab-button text-white font-semibold py-2 px-6 rounded-full transition-all duration-200 hover:bg-purple-600" data-tab="facultyList">Faculty List</button>
+                <button class="tab-button text-white font-semibold py-2 px-6 rounded-full transition-all duration-200 hover:bg-purple-600" data-tab="subjectList">Subject List</button>
+                <button class="tab-button text-white font-semibold py-2 px-6 rounded-full transition-all duration-200 hover:bg-purple-600" data-tab="todayAttendance">Today's Attendance</button>
+                <button class="tab-button text-white font-semibold py-2 px-6 rounded-full transition-all duration-200 hover:bg-purple-600" data-tab="monthlyReport">Monthly Report</button>
+                <button class="tab-button text-white font-semibold py-2 px-6 rounded-full transition-all duration-200 hover:bg-purple-600" data-tab="publicAnnouncements">Announcements</button>
+            </div>
+        </nav>
+
+
+        <!-- Main Content Area for Tabs -->
+        <main class="flex-1 container mx-auto px-4 py-8 bg-white shadow-lg rounded-b-xl mb-8">
+            <!-- Student List Tab Content -->
+            <section id="studentList" class="tab-content active">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Student List</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Add Student Form -->
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Add New Student</h3>
+                        <form id="addStudentForm" class="space-y-4">
+                            <div>
+                                <label for="studentRollNo" class="block text-gray-700 font-medium mb-1">Roll No.</label>
+                                <input type="text" id="studentRollNo" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="studentName" class="block text-gray-700 font-medium mb-1">Name</label>
+                                <input type="text" id="studentName" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <button type="submit" class="w-full btn-success">
+                                Add Student
+                            </button>
+                            <div id="addStudentMessage" class="text-center mt-2"></div>
+                        </form>
+                        <button id="editStudentSemesterBtn" class="mt-6 w-full btn-secondary">
+                            Edit Student Semester (Promote/Demote)
+                        </button>
+                    </div>
+
+
+                    <!-- Student List Display -->
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200 flex flex-col">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Current Students (Semester <span id="currentStudentSemester"></span>)</h3>
+                        <div class="table-container flex-1">
+                            <table class="min-w-full bg-white rounded-xl overflow-hidden">
+                                <thead class="bg-gray-200 sticky top-0">
+                                    <tr>
+                                        <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Roll No.</th>
+                                        <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Name</th>
+                                        <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Added by</th>
+                                        <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentListTableBody">
+                                    <tr><td colspan="4" class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Loading students...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button id="downloadStudentList" class="mt-4 w-full btn-secondary">
+                            Download Student List
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Faculty List Tab Content -->
+            <section id="facultyList" class="tab-content">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Faculty List (Semester <span id="currentFacultySemester"></span>)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Add Faculty Form -->
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Add New Faculty</h3>
+                        <form id="addFacultyForm" class="space-y-4">
+                            <div>
+                                <label for="facultyName" class="block text-gray-700 font-medium mb-1">Name</label>
+                                <input type="text" id="facultyName" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <button type="submit" class="w-full btn-success">
+                                Add Faculty
+                            </button>
+                            <div id="addFacultyMessage" class="text-center mt-2"></div>
+                        </form>
+                    </div>
+
+
+                    <!-- Faculty List Display -->
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200 flex flex-col">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Current Faculty</h3>
+                        <div class="table-container flex-1">
+                            <table class="min-w-full bg-white rounded-xl overflow-hidden">
+                                <thead class="bg-gray-200 sticky top-0">
+                                    <tr>
+                                        <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Name</th>
+                                        <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Added by</th>
+                                        <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="facultyListTableBody">
+                                    <tr><td colspan="3" class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Loading faculty...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Subject List Tab Content -->
+            <section id="subjectList" class="tab-content">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Subject List (Semester <span id="currentSubjectSemester"></span>)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Add Subject Form -->
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Add New Subject</h3>
+                        <form id="addSubjectForm" class="space-y-4">
+                            <div>
+                                <label for="subjectName" class="block text-gray-700 font-medium mb-1">Name</label>
+                                <input type="text" id="subjectName" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <button type="submit" class="w-full btn-success">
+                                Add Subject
+                            </button>
+                            <div id="addSubjectMessage" class="text-center mt-2"></div>
+                        </form>
+                    </div>
+
+
+                    <!-- Subject List Display -->
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200 flex flex-col">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Current Subjects</h3>
+                        <div class="table-container flex-1">
+                            <table class="min-w-full bg-white rounded-xl overflow-hidden">
+                                <thead class="bg-gray-200 sticky top-0">
+                                    <tr>
+                                        <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Name</th>
+                                        <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Added by</th>
+                                        <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subjectListTableBody">
+                                    <tr><td colspan="3" class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Loading subjects...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Today's Attendance Tab Content -->
+            <section id="todayAttendance" class="tab-content">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Today's Attendance (Semester <span id="currentTodayAttendanceSemester"></span>)</h2>
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200 mb-8">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Mark Attendance</h3>
+                    <form id="markAttendanceForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="attendanceDate" class="block text-gray-700 font-medium mb-1">Date</label>
+                            <input type="date" id="attendanceDate" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label for="attendanceFaculty" class="block text-gray-700 font-medium mb-1">Faculty Name</label>
+                            <select id="attendanceFaculty" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                <!-- Options populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="attendancePeriod" class="block text-gray-700 font-medium mb-1">Period No.</label>
+                            <select id="attendancePeriod" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                <option value="">Select Period</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="attendanceSubject" class="block text-gray-700 font-medium mb-1">Subject Name</label>
+                            <select id="attendanceSubject" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                <!-- Options populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="absentRollNos" class="block text-gray-700 font-medium mb-1">Absent Roll Nos. (comma-separated)</label>
+                            <textarea id="absentRollNos" rows="3" placeholder="e.g., 01, 05, 12"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <button type="submit" class="w-full btn-primary">
+                                Save Attendance for Period
+                            </button>
+                            <div id="markAttendanceMessage" class="text-center mt-2"></div>
+                        </div>
+                    </form>
+                </div>
+
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Attendance Records for Today</h3>
+                    <div class="table-container">
+                        <table class="min-w-full bg-white rounded-xl overflow-hidden">
+                            <thead class="bg-gray-200 sticky top-0">
+                                <tr>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Date</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Period</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Faculty</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Subject</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Absent Roll Nos.</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Added by</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="todayAttendanceTableBody">
+                                <tr><td colspan="7" class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Loading attendance...</td></tr>
+                                </tbody>
+                        </table>
+                    </div>
+                    <button id="downloadTodayAttendance" class="mt-4 w-full btn-secondary">
+                        Download Today's Attendance
+                    </button>
+                </div>
+
+
+                <!-- NEW SECTION FOR MISMATCH REPORT -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200 mt-8">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Forenoon Present, Afternoon Absent Report</h3>
+                    <p class="text-gray-600 mb-4">Identify students who attended periods 1-3 but were absent during all recorded periods 4-6 on the selected date.</p>
+                    <button id="generateMismatchReport" class="btn-primary w-full md:w-auto mb-4">
+                        Generate Mismatch Report
+                    </button>
+                    <div id="mismatchReportMessage" class="text-center mt-2"></div>
+
+
+                    <div id="forenoonAfternoonMismatchOutput" class="table-container hidden">
+                        <table class="min-w-full bg-white rounded-xl overflow-hidden">
+                            <thead class="bg-gray-200 sticky top-0">
+                                <tr>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Roll No.</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Name</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mismatchReportTableBody">
+                                <tr><td colspan="2" class="text-center py-4 text-gray-500">Generate report to see data.</td></tr>
+                            </tbody>
+                        </table>
+                        <button id="downloadMismatchReport" class="mt-4 w-full btn-secondary" disabled>
+                            Download Mismatch List
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Monthly Report Tab Content -->
+            <section id="monthlyReport" class="tab-content">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Monthly Attendance Report (Semester <span id="currentMonthlyReportSemester"></span>)</h2>
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200 mb-8">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Generate Report</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="reportMonth" class="block text-gray-700 font-medium mb-1">Select Month</label>
+                            <input type="month" id="reportMonth" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div class="flex items-end">
+                            <button id="generateMonthlyReport" class="w-full btn-primary">
+                                Generate Report
+                            </button>
+                        </div>
+                    </div>
+                    <div id="reportMessage" class="text-center mt-4"></div>
+                </div>
+
+
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Report Details</h3>
+                    <div class="table-container">
+                        <table class="min-w-full bg-white rounded-xl overflow-hidden">
+                            <thead class="bg-gray-200 sticky top-0">
+                                <tr>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Roll No.</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Name</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Total Periods</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Attended Periods</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-bold uppercase text-sm">Percentage (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monthlyReportTableBody">
+                                <tr><td colspan="5" class="text-center py-4 text-gray-500">Please generate a report to see data.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button id="downloadMonthlyReport" class="mt-4 w-full btn-secondary">
+                        Download Monthly Report
+                    </button>
+                    <!-- New button for LLM-powered insights -->
+                    <button id="generateReportInsights" class="mt-4 w-full btn-secondary">
+                        ✨ Generate Report Insights
+                    </button>
+                    <div id="reportInsightsOutput" class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200 text-gray-700 leading-relaxed min-h-[100px] hidden">
+                        <!-- LLM generated insights will be displayed here -->
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Announcements Tab Content (Private to User) -->
+            <section id="publicAnnouncements" class="tab-content">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Your Announcements (Semester <span id="currentAnnouncementsSemester"></span>)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Add Announcement Form -->
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-700 mb-4">Post New Announcement</h3>
+                        <form id="addAnnouncementForm" class="space-y-4">
+                            <div>
+                                <label for="announcementTitle" class="block text-gray-700 font-medium mb-1">Title</label>
+                                <input type="text" id="announcementTitle" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label for="announcementMessage" class="block text-gray-700 font-medium mb-1">Message</label>
+                                <textarea id="announcementMessage" rows="4" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+                            </div>
+                            <button type="submit" class="w-full btn-success">
+                                Post Announcement
+                            </button>
+                            <div id="addAnnouncementMessage" class="text-center mt-2"></div>
+                        </form>
+                    </div>
+
+
+                    <!-- Announcements Feed -->
+                    <div id="announcementsFeed" class="announcement-feed flex-1 space-y-4">
+                        <p class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Loading announcements...</p>
+                        <!-- Announcements will be loaded here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-white py-6 px-4 text-center">
+            <p class="text-sm md:text-base">&copy; <span id="currentYear"></span> Department of Electrical and Electronics Engineering, GPTC Pala</p>
+            <p class="text-xs md:text-sm text-gray-400 mt-1">Powered by Lumina Web Solutions</p>
+        </footer>
+    </div>
+
+
+    <!-- Custom Modal for editing data -->
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="editModalTitle" class="text-xl font-bold mb-4 text-gray-800">Edit Item</h3>
+            <div id="editModalContent" class="space-y-4 mb-6">
+                <!-- Dynamic form fields will be inserted here -->
+            </div>
+            <div class="flex justify-end gap-3">
+                <button id="editModalCancelBtn" class="btn-secondary">
+                    Cancel
+                </button>
+                <button id="editModalSaveBtn" class="btn-primary">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Custom Modal for delete confirmation -->
+    <div id="deleteConfirmModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4 text-red-700">Confirm Deletion</h3>
+            <p id="deleteConfirmMessage" class="text-gray-700 mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
+            <div class="flex justify-end gap-3">
+                <button id="deleteModalCancelBtn" class="btn-secondary">
+                    Cancel
+                </button>
+                <button id="deleteModalConfirmBtn" class="btn-danger">
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Custom Modal for general alerts -->
+    <div id="customModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="modalTitle" class="text-xl font-bold mb-4 text-gray-800"></h3>
+            <p id="modalMessage" class="text-gray-700 mb-6"></p>
+            <button id="modalCloseButton" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-2xl font-bold">
+                &times;
+            </button>
+        </div>
+    </div>
+
+
+    <!-- NEW MODAL FOR EDITING STUDENT SEMESTER -->
+    <div id="editStudentSemesterModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Edit Student Semester</h3>
+            <div class="mb-4">
+                <label for="selectStudentToEditSemester" class="block text-gray-700 font-medium mb-1">Select Student (Current Semester)</label>
+                <select id="selectStudentToEditSemester" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white">
+                    <option value="">-- Select a student --</option>
+                </select>
+                <p id="editStudentSemesterMessage" class="text-center mt-2 text-gray-600"></p>
+            </div>
+            <div class="mb-6">
+                <label for="targetSemesterSelect" class="block text-gray-700 font-medium mb-1">Move to Semester</label>
+                <select id="targetSemesterSelect" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 bg-white">
+                    <option value="">-- Select target semester --</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                    <option value="3">Semester 3</option>
+                    <option value="4">Semester 4</option>
+                    <option value="5">Semester 5</option>
+                    <option value="6">Semester 6</option>
+                    <option value="passout">Passout</option>
+                </select>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button id="editStudentSemesterCancelBtn" class="btn-secondary">
+                    Cancel
+                </button>
+                <button id="editStudentSemesterSaveBtn" class="btn-primary">
+                    Move Student
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Custom Confirmation Modal (for global promotion warning) -->
+    <div id="confirmationModal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="confirmModalTitle" class="text-xl font-bold mb-4 text-red-700">Confirm Action</h3>
+            <p id="confirmModalMessage" class="text-gray-700 mb-6"></p>
+            <div class="flex justify-end gap-3">
+                <button id="confirmModalCancelBtn" class="btn-secondary">
+                    Cancel
+                </button>
+                <button id="confirmModalConfirmBtn" class="btn-danger">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- Firebase SDKs and custom JavaScript for functionality -->
+    <script type="module">
+        // Firebase SDK imports from CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // Import signInWithEmailAndPassword and signOut for explicit user login/logout
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // Import runTransaction for atomic updates across multiple documents
+        import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, where, doc, updateDoc, deleteDoc, orderBy, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+
+        // Firebase configuration provided by the user (KEEP THIS AS IS)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAnf5rSx0FLGEhooppoXnnl74rrIR-Z1lM",
+            authDomain: "attendance-eee.firebaseapp.com",
+            projectId: "attendance-eee",
+            storageBucket: "attendance-eee.firebasestorage.app",
+            messagingSenderId: "843713468526",
+            appId: "1:843713468526:web:3b2ef56f8a964336e0ee7f"
+        };
+
+
+        // Initialize Firebase services
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+
+        // --- IMPORTANT DEBUG LOGGING ---
+        console.log("Firebase Config loaded:", firebaseConfig);
+        // --- END DEBUG LOGGING ---
+
+
+        // Global variables for app ID and authenticated user info
+        // *** MODIFIED: Using a fixed appId for consistent global sharing ***
+        const appId = 'attendance-eee-app-global-share'; // This ID MUST match your Firestore security rules.
+        let currentUserId = 'anonymous'; // Current authenticated user's UID
+        let currentUserEmail = 'anonymous'; // Current authenticated user's email
+        // Load semester from local storage or default to '1'
+        let currentSemester = localStorage.getItem('currentSemester') || '1';
+
+
+        let studentsData = []; // Cache for student data
+        let facultyData = []; // Cache for faculty data
+        let subjectsData = []; // Cache for subject data
+        let dailyAttendanceRecords = []; // Cache for daily attendance records
+        let announcementsData = []; // Cache for announcements (now public)
+
+
+        // Define forenoon and afternoon periods
+        const FORENOON_PERIODS = [1, 2, 3];
+        const AFTERNOON_PERIODS = [4, 5, 6];
+
+
+        // --- UI Element References ---
+        const loginPage = document.getElementById('loginPage');
+        const mainApp = document.getElementById('mainApp');
+        const loginForm = document.getElementById('loginForm');
+        const loginMessage = document.getElementById('loginMessage');
+        const loginEmailInput = document.getElementById('email');
+        const loginPasswordInput = document.getElementById('password');
+        const displayUserId = document.getElementById('displayUserId'); // To show logged-in UID
+        const displaySemester = document.getElementById('displaySemester'); // To show selected semester
+        const semesterSelect = document.getElementById('semesterSelect'); // Semester dropdown in header
+        const logoutButton = document.getElementById('logoutButton'); // New logout button
+
+
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+
+        const studentListTableBody = document.getElementById('studentListTableBody');
+        const addStudentForm = document.getElementById('addStudentForm');
+        const addStudentMessage = document.getElementById('addStudentMessage');
+        const downloadStudentListBtn = document.getElementById('downloadStudentList');
+        const currentStudentSemesterDisplay = document.getElementById('currentStudentSemester');
+
+
+        const facultyListTableBody = document.getElementById('facultyListTableBody');
+        const addFacultyForm = document.getElementById('addFacultyForm');
+        const addFacultyMessage = document.getElementById('addFacultyMessage');
+        const currentFacultySemesterDisplay = document.getElementById('currentFacultySemester');
+
+
+
+
+        const subjectListTableBody = document.getElementById('subjectListTableBody');
+        const addSubjectForm = document.getElementById('addSubjectForm');
+        const addSubjectMessage = document.getElementById('addSubjectMessage');
+        const currentSubjectSemesterDisplay = document.getElementById('currentSubjectSemester');
+
+
+
+
+        const attendanceFacultySelect = document.getElementById('attendanceFaculty');
+        const attendanceSubjectSelect = document.getElementById('attendanceSubject');
+        const markAttendanceForm = document.getElementById('markAttendanceForm');
+        const markAttendanceMessage = document.getElementById('markAttendanceMessage');
+        const todayAttendanceTableBody = document.getElementById('todayAttendanceTableBody');
+        const downloadTodayAttendanceBtn = document.getElementById('downloadTodayAttendance');
+        const attendanceDateInput = document.getElementById('attendanceDate');
+        const currentTodayAttendanceSemesterDisplay = document.getElementById('currentTodayAttendanceSemester');
+
+
+
+
+        const monthlyReportTableBody = document.getElementById('monthlyReportTableBody');
+        const reportMonthInput = document.getElementById('reportMonth');
+        const generateMonthlyReportBtn = document.getElementById('generateMonthlyReport');
+        const downloadMonthlyReportBtn = document.getElementById('downloadMonthlyReport');
+        const reportMessage = document.getElementById('reportMessage');
+        const generateReportInsightsBtn = document.getElementById('generateReportInsights');
+        const reportInsightsOutput = document.getElementById('reportInsightsOutput');
+        const currentMonthlyReportSemesterDisplay = document.getElementById('currentMonthlyReportSemester');
+
+
+
+
+        const addAnnouncementForm = document.getElementById('addAnnouncementForm');
+        const addAnnouncementMessage = document.getElementById('addAnnouncementMessage');
+        const announcementsFeed = document.getElementById('announcementsFeed');
+        const currentAnnouncementsSemesterDisplay = document.getElementById('currentAnnouncementsSemester');
+
+
+
+
+        // New elements for Forenoon/Afternoon Mismatch Report
+        const generateMismatchReportBtn = document.getElementById('generateMismatchReport');
+        const mismatchReportMessage = document.getElementById('mismatchReportMessage');
+        const forenoonAfternoonMismatchOutput = document.getElementById('forenoonAfternoonMismatchOutput');
+        const mismatchReportTableBody = document.getElementById('mismatchReportTableBody');
+        const downloadMismatchReportBtn = document.getElementById('downloadMismatchReport');
+        let mismatchStudentsList = []; // To store the generated list for download
+
+
+        // Modal elements
+        const editModal = document.getElementById('editModal');
+        const editModalTitle = document.getElementById('editModalTitle');
+        const editModalContent = document.getElementById('editModalContent');
+        const editModalCancelBtn = document.getElementById('editModalCancelBtn');
+        const editModalSaveBtn = document.getElementById('editModalSaveBtn');
+
+
+        const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+        const deleteConfirmMessage = document.getElementById('deleteConfirmMessage');
+        const deleteModalCancelBtn = document.getElementById('deleteModalCancelBtn');
+        const deleteModalConfirmBtn = document.getElementById('deleteModalConfirmBtn');
+
+
+        const customModal = document.getElementById('customModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+
+        // New elements for Edit Student Semester Modal
+        const editStudentSemesterBtn = document.getElementById('editStudentSemesterBtn');
+        const editStudentSemesterModal = document.getElementById('editStudentSemesterModal');
+        const selectStudentToEditSemester = document.getElementById('selectStudentToEditSemester');
+        const targetSemesterSelect = document.getElementById('targetSemesterSelect');
+        const editStudentSemesterMessage = document.getElementById('editStudentSemesterMessage');
+        const editStudentSemesterCancelBtn = document.getElementById('editStudentSemesterCancelBtn');
+        const editStudentSemesterSaveBtn = document.getElementById('editStudentSemesterSaveBtn');
+
+
+        // Confirmation Modal elements
+        const confirmationModal = document.getElementById('confirmationModal');
+        const confirmModalTitle = document.getElementById('confirmModalTitle');
+        const confirmModalMessage = document.getElementById('confirmModalMessage');
+        const confirmModalCancelBtn = document.getElementById('confirmModalCancelBtn');
+        const confirmModalConfirmBtn = document.getElementById('confirmModalConfirmBtn');
+
+
+
+
+        let currentEditingItem = null; // Stores data of item being edited
+        let currentDeletingItem = null; // Stores data of item being deleted
+
+
+
+
+        // --- Initial Setup ---
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+
+        // Set default date for attendance to today
+        attendanceDateInput.valueAsDate = new Date();
+
+
+        // Initialize semester dropdown value
+        semesterSelect.value = currentSemester;
+        displaySemester.textContent = currentSemester; // Update display on load
+
+
+        // --- Event Listeners for UI elements ---
+        semesterSelect.addEventListener('change', (e) => {
+            currentSemester = e.target.value;
+            localStorage.setItem('currentSemester', currentSemester); // Persist selected semester
+            displaySemester.textContent = currentSemester;
+            console.log(`[Semester Change] Switched to Semester: ${currentSemester}`);
+            // Re-fetch all data and update UI for the new semester
+            refreshAllSemesterDependentData();
+        });
+
+
+        // --- Authentication Logic ---
+        /**
+         * Listens for Firebase Auth state changes.
+         * Sets userId and shows/hides login/main app based on auth status.
+         * Calls `refreshAllSemesterDependentData` once authenticated.
+         */
+        onAuthStateChanged(auth, (user) => {
+            console.log("[Auth State Change] onAuthStateChanged triggered. User object:", user);
+            if (user) {
+                // User is signed in.
+                currentUserId = user.uid;
+                currentUserEmail = user.email || 'N/A'; // Use email if available
+                displayUserId.textContent = currentUserId; // Display UID in header
+                displaySemester.textContent = currentSemester; // Ensure semester is also displayed
+                console.log("[Auth State Change] User logged in. UID:", currentUserId, "Email:", currentUserEmail, "Current Semester:", currentSemester);
+                loginPage.classList.add('hidden');
+                mainApp.classList.remove('hidden');
+                showTab('studentList'); // Show default tab after login
+
+
+                // Refresh all data relevant to the current semester
+                refreshAllSemesterDependentData();
+
+
+            } else {
+                // User is signed out.
+                currentUserId = 'anonymous';
+                currentUserEmail = 'anonymous';
+                displayUserId.textContent = 'Not logged in';
+                displaySemester.textContent = 'N/A';
+                console.log("[Auth State Change] User logged out or not authenticated. Displaying login page.");
+                loginPage.classList.remove('hidden');
+                mainApp.classList.add('hidden');
+                // Clear any cached data when logged out
+                studentsData = [];
+                facultyData = [];
+                subjectsData = [];
+                dailyAttendanceRecords = [];
+                announcementsData = [];
+            }
+        });
+
+
+        // Logout functionality
+        logoutButton.addEventListener('click', async () => {
+            try {
+                console.log("[Logout] Attempting to sign out...");
+                await signOut(auth);
+                console.log("[Logout] User signed out successfully.");
+                // onAuthStateChanged listener will handle redirect to login page
+            } catch (error) {
+                console.error("[Logout Error]", error);
+                showModal("Logout Error", "Failed to log out. Please try again.");
+            }
+        });
+
+
+
+
+        // Function to refresh all data listeners and UI dependent on semester and user ID
+        function refreshAllSemesterDependentData() {
+            // Clear current table contents and show loading states
+            studentListTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Loading students...</td></tr>';
+            facultyListTableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Loading faculty...</td></tr>';
+            subjectListTableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Loading subjects...</td></tr>';
+            todayAttendanceTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Loading attendance...</td></tr>';
+            monthlyReportTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Please generate a report to see data.</td></tr>';
+            announcementsFeed.innerHTML = '<p class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Loading announcements...</p>';
+
+
+            // Update semester displays on relevant sections
+            currentStudentSemesterDisplay.textContent = currentSemester;
+            currentFacultySemesterDisplay.textContent = currentSemester;
+            currentSubjectSemesterDisplay.textContent = currentSemester;
+            currentTodayAttendanceSemesterDisplay.textContent = currentSemester;
+            currentMonthlyReportSemesterDisplay.textContent = currentSemester;
+            currentAnnouncementsSemesterDisplay.textContent = currentSemester;
+
+
+
+
+            // Setup real-time listeners for user's private data collections for the CURRENT semester
+            setupStudentListListener();
+            setupFacultyListListener();
+            setupSubjectListListener();
+            setupAnnouncementsListener();
+            fetchAndDisplayTodayAttendance(); // For today's attendance, ensure it's tied to currentSemester
+        }
+
+
+
+
+        // --- Navigation (Tabs) ---
+        function showTab(tabId) {
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            tabButtons.forEach(button => {
+                button.classList.remove('tab-active');
+            });
+
+
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('tab-active');
+
+
+            // Specific reset/refresh actions when a tab becomes active
+            if (tabId === 'todayAttendance') {
+                populateFacultyAndSubjectDropdowns();
+                fetchAndDisplayTodayAttendance(); // Re-fetch based on current date selection
+                // Reset mismatch report area when tab is opened
+                forenoonAfternoonMismatchOutput.classList.add('hidden');
+                mismatchReportMessage.textContent = '';
+                mismatchReportTableBody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-gray-500">Generate report to see data.</td></tr>';
+                downloadMismatchReportBtn.disabled = true;
+                mismatchStudentsList = [];
+
+
+            } else if (tabId === 'monthlyReport') {
+                monthlyReportTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Please generate a report to see data.</td></tr>';
+                reportMessage.textContent = '';
+                reportInsightsOutput.classList.add('hidden'); // Hide insights output when tab is opened
+                reportInsightsOutput.textContent = '';
+            }
+            // No specific refresh needed for other tabs, as they are real-time via onSnapshot
+        }
+
+
+        // Add event listeners to tab buttons
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.dataset.tab;
+                showTab(tabId);
+            });
+        });
+
+
+        // --- Firebase Data Operations (Public Data, Semester as Field) ---
+
+
+        /**
+         * Generic function to get a collection reference for public data.
+         * @param {string} collectionName - The base name of the Firestore collection (e.g., 'students', 'passout').
+         * @returns {CollectionReference} The Firestore collection reference.
+         */
+        function getCollectionRef(collectionName) {
+            if (!auth.currentUser) {
+                console.warn(`[Firestore Path] Cannot get collection ref for ${collectionName}: user not authenticated.`);
+                return null;
+            }
+            // MODIFIED: Using fixed appId here
+            const path = `artifacts/${appId}/public/data/${collectionName}`;
+            console.log(`[Firestore Path] Using collection path: ${path}`);
+            return collection(db, path);
+        }
+
+
+        /**
+         * Generic function to get a document reference for public data.
+         * @param {string} collectionName - The base name of the Firestore collection.
+         * @param {string} docId - The ID of the document.
+         * @returns {DocumentReference} The Firestore document reference.
+         */
+        function getDocRef(collectionName, docId) {
+            if (!auth.currentUser) {
+                console.warn(`[Firestore Path] Cannot get document ref for ${collectionName}/${docId}: user not authenticated.`);
+                return null;
+            }
+            // MODIFIED: Using fixed appId here
+            const path = `artifacts/${appId}/public/data/${collectionName}/${docId}`;
+            console.log(`[Firestore Path] Using document path: ${path}`);
+            return doc(db, path);
+        }
+
+
+        /**
+         * Generic function to add data to a public Firestore collection, including semester if applicable.
+         * @param {string} collectionName - The name of the Firestore collection.
+         * @param {Object} data - The data to add.
+         * @param {HTMLElement} messageElement - The DOM element to display feedback.
+         */
+        async function addData(collectionName, data, messageElement) {
+            const colRef = getCollectionRef(collectionName);
+            if (!colRef) {
+                messageElement.textContent = 'Error: Not logged in. Please log in first.';
+                messageElement.classList.add('text-red-600');
+                messageElement.classList.remove('text-green-600');
+                setTimeout(() => messageElement.textContent = '', 5000);
+                return;
+            }
+
+
+            try {
+                // Add semester field if not 'passout'
+                const dataWithSemester = {
+                    ...data,
+                    addedByUid: currentUserId,
+                    addedByEmail: currentUserEmail,
+                    timestamp: new Date().toISOString()
+                };
+                if (collectionName !== 'passout') {
+                    dataWithSemester.semester = currentSemester;
+                }
+
+
+                await addDoc(colRef, dataWithSemester);
+                messageElement.textContent = 'Added successfully!';
+                messageElement.classList.add('text-green-600');
+                messageElement.classList.remove('text-red-600');
+                console.log(`[Add Data] Data added successfully to ${collectionName} (Semester: ${currentSemester})`);
+            } catch (error) {
+                console.error(`[Add Data Error] Error adding ${collectionName} data:`, error);
+                messageElement.textContent = `Error adding data: ${error.message}.`;
+                messageElement.classList.add('text-red-600');
+                messageElement.classList.remove('text-green-600');
+            }
+            setTimeout(() => messageElement.textContent = '', 5000);
+        }
+
+
+        /**
+         * Generic function to update data in a public Firestore collection.
+         * @param {string} collectionName - The name of the Firestore collection.
+         * @param {string} docId - The ID of the document to update.
+         * @param {Object} data - The data to update.
+         */
+        async function updateData(collectionName, docId, data) {
+            const docRef = getDocRef(collectionName, docId);
+            if (!docRef) {
+                showModal('Error', 'Not logged in. Please log in to edit data.');
+                return false;
+            }
+            try {
+                await updateDoc(docRef, data);
+                console.log(`[Update Data] Document updated successfully: ${collectionName}/${docId}`);
+                return true;
+            } catch (error) {
+                console.error(`[Update Data Error] Error updating document ${docId} in ${collectionName}:`, error);
+                showModal('Error', `Failed to update item: ${error.message}`);
+                return false;
+            }
+        }
+
+
+        /**
+         * Generic function to delete data from a public Firestore collection.
+         * @param {string} collectionName - The name of the Firestore collection.
+         * @param {string} docId - The ID of the document to delete.
+         */
+        async function deleteData(collectionName, docId) {
+            const docRef = getDocRef(collectionName, docId);
+            if (!docRef) {
+                showModal('Error', 'Not logged in. Please log in to delete data.');
+                return false;
+            }
+            try {
+                await deleteDoc(docRef);
+                console.log(`[Delete Data] Document deleted successfully: ${collectionName}/${docId}`);
+                return true;
+            } catch (error) {
+                console.error(`[Delete Data Error] Error deleting document ${docId} from ${collectionName}:`, error);
+                showModal('Error', `Failed to delete item: ${error.message}`);
+                return false;
+            }
+        }
+
+
+
+
+        // --- Student List Management ---
+        addStudentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const rollNo = addStudentForm.querySelector('#studentRollNo').value.trim();
+            const name = addStudentForm.querySelector('#studentName').value.trim();
+            if (rollNo && name) {
+                await addData('students', { rollNo: rollNo.toUpperCase(), name }, addStudentMessage);
+                addStudentForm.reset();
+            } else {
+                addStudentMessage.textContent = 'Please fill both Roll No. and Name.';
+                addStudentMessage.classList.add('text-red-600');
+                setTimeout(() => addStudentMessage.textContent = '', 5000);
+            }
+        });
+
+
+        // Real-time listener for Student List (Public Data, Semester-Specific Filter)
+        function setupStudentListListener() {
+            const studentsColRef = getCollectionRef('students');
+            if (!studentsColRef) {
+                studentListTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Please log in to view student data.</td></tr>';
+                return;
+            }
+            // Query for students in the current semester - NO ORDER BY to avoid index issues
+            // Data will be sorted client-side.
+            const q = query(studentsColRef, where("semester", "==", currentSemester));
+            console.log(`[Student Listener] Setting up listener for students in public collection for semester ${currentSemester}`);
+            onSnapshot(q, (snapshot) => {
+                studentsData = []; // Clear previous data
+                snapshot.forEach((doc) => {
+                    const student = { id: doc.id, ...doc.data() };
+                    studentsData.push(student);
+                });
+
+
+                // Sort studentsData in JavaScript after fetching
+                studentsData.sort((a, b) => a.rollNo.localeCompare(b.rollNo));
+
+
+                studentListTableBody.innerHTML = ''; // Clear table
+                if (studentsData.length === 0) {
+                    studentListTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">No students added yet for this semester.</td></tr>';
+                }
+                studentsData.forEach((student) => {
+                    const row = studentListTableBody.insertRow();
+                    row.classList.add('hover:bg-gray-50');
+                    row.insertCell().textContent = student.rollNo;
+                    row.insertCell().textContent = student.name;
+                    row.insertCell().textContent = student.addedByEmail || student.addedByUid || 'Unknown';
+
+
+                    const actionsCell = row.insertCell();
+                    const editBtn = document.createElement('button');
+                    editBtn.textContent = 'Edit';
+                    editBtn.classList.add('bg-blue-500', 'hover:bg-blue-600', 'text-white', 'py-1', 'px-2', 'rounded-md', 'mr-2', 'text-sm');
+                    editBtn.onclick = () => showEditModal('students', student.id, { rollNo: student.rollNo, name: student.name });
+                    actionsCell.appendChild(editBtn);
+
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.classList.add('bg-red-500', 'hover:bg-red-600', 'text-white', 'py-1', 'px-2', 'rounded-md', 'text-sm');
+                    deleteBtn.onclick = () => showDeleteConfirm('students', student.id, `student ${student.rollNo} (${student.name})`);
+                    actionsCell.appendChild(deleteBtn);
+
+
+                    Array.from(row.cells).forEach(cell => cell.classList.add('py-2', 'px-4', 'border-b', 'border-gray-200'));
+                });
+                console.log(`[Student Listener] Students data for semester ${currentSemester} updated and sorted:`, studentsData);
+            }, (error) => {
+                console.error("[Student Listener Error] Error listening to students collection:", error);
+                studentListTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-red-500">Error loading student data: ' + error.message + '</td></tr>';
+            });
+        }
+
+
+        // Download Student List as CSV
+        downloadStudentListBtn.addEventListener('click', () => {
+            if (studentsData.length === 0) {
+                showModal('No Data', 'No student data to download. Please add students first.');
+                return;
+            }
+            let csvContent = "Roll No.,Name,Added By\n";
+            studentsData.forEach(student => {
+                csvContent += `${student.rollNo},"${student.name.replace(/"/g, '""')}", "${(student.addedByEmail || student.addedByUid || 'Unknown').replace(/"/g, '""')}"\n`;
+            });
+            downloadCSV(csvContent, `student_list_sem${currentSemester}.csv`);
+        });
+
+
+        // --- Faculty List Management ---
+        addFacultyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = addFacultyForm.querySelector('#facultyName').value.trim();
+            if (name) {
+                await addData('faculty', { name }, addFacultyMessage);
+                addFacultyForm.reset();
+            } else {
+                addFacultyMessage.textContent = 'Please enter Faculty Name.';
+                addFacultyMessage.classList.add('text-red-600');
+                setTimeout(() => addFacultyMessage.textContent = '', 5000);
+            }
+        });
+
+
+        // Real-time listener for Faculty List (Public Data, Semester-Specific Filter)
+        function setupFacultyListListener() {
+            const facultyColRef = getCollectionRef('faculty');
+            if (!facultyColRef) {
+                facultyListTableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-red-500">Please log in to view faculty data.</td></tr>';
+                return;
+            }
+            // Query for faculty in the current semester - NO ORDER BY
+            // Data will be sorted client-side.
+            const q = query(facultyColRef, where("semester", "==", currentSemester));
+            console.log(`[Faculty Listener] Setting up listener for faculty in public collection for semester ${currentSemester}`);
+            onSnapshot(q, (snapshot) => {
+                facultyData = [];
+                snapshot.forEach((doc) => {
+                    const faculty = { id: doc.id, ...doc.data() };
+                    facultyData.push(faculty);
+                });
+
+
+                // Sort facultyData in JavaScript after fetching
+                facultyData.sort((a, b) => a.name.localeCompare(b.name));
+
+
+                facultyListTableBody.innerHTML = '';
+                if (facultyData.length === 0) {
+                    facultyListTableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500">No faculty added yet for this semester.</td></tr>';
+                }
+                facultyData.forEach((faculty) => {
+                    const row = facultyListTableBody.insertRow();
+                    row.classList.add('hover:bg-gray-50');
+                    row.insertCell().textContent = faculty.name;
+                    row.insertCell().textContent = faculty.addedByEmail || faculty.addedByUid || 'Unknown';
+
+
+                    const actionsCell = row.insertCell();
+                    const editBtn = document.createElement('button');
+                    editBtn.textContent = 'Edit';
+                    editBtn.classList.add('bg-blue-500', 'hover:bg-blue-600', 'text-white', 'py-1', 'px-2', 'rounded-md', 'mr-2', 'text-sm');
+                    editBtn.onclick = () => showEditModal('faculty', faculty.id, { name: faculty.name });
+                    actionsCell.appendChild(editBtn);
+
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.classList.add('bg-red-500', 'hover:bg-red-600', 'text-white', 'py-1', 'px-2', 'rounded-md', 'text-sm');
+                    deleteBtn.onclick = () => showDeleteConfirm('faculty', faculty.id, `faculty ${faculty.name}`);
+                    actionsCell.appendChild(deleteBtn);
+
+
+                    Array.from(row.cells).forEach(cell => cell.classList.add('py-2', 'px-4', 'border-b', 'border-gray-200'));
+                });
+                console.log(`[Faculty Listener] Faculty data for semester ${currentSemester} updated and sorted:`, facultyData);
+            }, (error) => {
+                console.error("[Faculty Listener Error] Error listening to faculty collection:", error);
+                facultyListTableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-red-500">Error loading faculty data: ' + error.message + '</td></tr>';
+            });
+        }
+
+
+        // --- Subject List Management ---
+        addSubjectForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = addSubjectForm.querySelector('#subjectName').value.trim();
+            if (name) {
+                await addData('subjects', { name }, addSubjectMessage);
+                addSubjectForm.reset();
+            } else {
+                addSubjectMessage.textContent = 'Please enter Subject Name.';
+                addSubjectMessage.classList.add('text-red-600');
+                setTimeout(() => addSubjectMessage.textContent = '', 5000);
+            }
+        });
+
+
+        // Real-time listener for Subject List (Public Data, Semester-Specific Filter)
+        function setupSubjectListListener() {
+            const subjectsColRef = getCollectionRef('subjects');
+            if (!subjectsColRef) {
+                subjectListTableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-red-500">Please log in to view subject data.</td></tr>';
+                return;
+            }
+            // Query for subjects in the current semester - NO ORDER BY
+            // Data will be sorted client-side.
+            const q = query(subjectsColRef, where("semester", "==", currentSemester));
+            console.log(`[Subject Listener] Setting up listener for subjects in public collection for semester ${currentSemester}`);
+            onSnapshot(q, (snapshot) => {
+                subjectsData = [];
+                snapshot.forEach((doc) => {
+                    const subject = { id: doc.id, ...doc.data() };
+                    subjectsData.push(subject);
+                });
+
+
+                // Sort subjectsData in JavaScript after fetching
+                subjectsData.sort((a, b) => a.name.localeCompare(b.name));
+
+
+                subjectListTableBody.innerHTML = '';
+                if (subjectsData.length === 0) {
+                    subjectListTableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500">No subjects added yet for this semester.</td></tr>';
+                }
+                subjectsData.forEach((subject) => {
+                    const row = subjectListTableBody.insertRow();
+                    row.classList.add('hover:bg-gray-50');
+                    row.insertCell().textContent = subject.name;
+                    row.insertCell().textContent = subject.addedByEmail || subject.addedByUid || 'Unknown';
+
+
+                    const actionsCell = row.insertCell();
+                    const editBtn = document.createElement('button');
+                    editBtn.textContent = 'Edit';
+                    editBtn.classList.add('bg-blue-500', 'hover:bg-blue-600', 'text-white', 'py-1', 'px-2', 'rounded-md', 'mr-2', 'text-sm');
+                    editBtn.onclick = () => showEditModal('subjects', subject.id, { name: subject.name });
+                    actionsCell.appendChild(editBtn);
+
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.classList.add('bg-red-500', 'hover:bg-red-600', 'text-white', 'py-1', 'px-2', 'rounded-md', 'text-sm');
+                    deleteBtn.onclick = () => showDeleteConfirm('subjects', subject.id, `subject ${subject.name}`);
+                    actionsCell.appendChild(deleteBtn);
+
+
+                    Array.from(row.cells).forEach(cell => cell.classList.add('py-2', 'px-4', 'border-b', 'border-gray-200'));
+                });
+                console.log(`[Subject Listener] Subjects data for semester ${currentSemester} updated and sorted:`, subjectsData);
+            }, (error) => {
+                console.error("[Subject Listener Error] Error listening to subjects collection:", error);
+                subjectListTableBody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-red-500">Error loading subject data: ' + error.message + '</td></tr>';
+            });
+        }
+
+
+        // --- Today's Attendance Management ---
+        async function populateFacultyAndSubjectDropdowns() {
+            // Populate Faculty
+            attendanceFacultySelect.innerHTML = '<option value="">Select Faculty</option>';
+            facultyData.forEach(faculty => {
+                const option = document.createElement('option');
+                option.value = faculty.name;
+                option.textContent = faculty.name;
+                attendanceFacultySelect.appendChild(option);
+            });
+
+
+            // Populate Subject
+            attendanceSubjectSelect.innerHTML = '<option value="">Select Subject</option>';
+            subjectsData.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.name;
+                option.textContent = subject.name;
+                attendanceSubjectSelect.appendChild(option);
+            });
+        }
+
+
+        markAttendanceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const date = markAttendanceForm.querySelector('#attendanceDate').value;
+            const facultyName = markAttendanceForm.querySelector('#attendanceFaculty').value;
+            const periodNo = markAttendanceForm.querySelector('#attendancePeriod').value;
+            const subjectName = markAttendanceForm.querySelector('#attendanceSubject').value;
+            const absentRollNosRaw = markAttendanceForm.querySelector('#absentRollNos').value;
+            const absentRollNos = absentRollNosRaw ? absentRollNosRaw.split(',').map(r => r.trim().toUpperCase()).filter(r => r) : [];
+
+
+            if (date && facultyName && periodNo && subjectName) {
+                await addData('dailyAttendance', {
+                    date,
+                    facultyName,
+                    periodNo: parseInt(periodNo), // Store as number for sorting/calculations
+                    subjectName,
+                    absentRollNos // Store as an array
+                }, markAttendanceMessage);
+                markAttendanceForm.reset();
+                attendanceDateInput.valueAsDate = new Date(); // Reset date to today after submission
+            } else {
+                markAttendanceMessage.textContent = 'Please fill all required fields (Date, Faculty, Period, Subject).';
+                markAttendanceMessage.classList.add('text-red-600');
+                markAttendanceMessage.classList.remove('text-green-600');
+                setTimeout(() => markAttendanceMessage.textContent = '', 5000);
+            }
+        });
+
+
+        // Fetch and display today's attendance records (Public Data, Semester-Specific Filter)
+        async function fetchAndDisplayTodayAttendance() {
+            const colRef = getCollectionRef('dailyAttendance');
+            if (!colRef) {
+                todayAttendanceTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-500">Please log in to view attendance.</td></tr>';
+                return;
+            }
+            todayAttendanceTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Loading attendance...</td></tr>';
+            try {
+                const today = attendanceDateInput.value;
+                // Query for today's records in the current semester - NO ORDER BY
+                // Data will be sorted client-side.
+                const q = query(colRef, where("semester", "==", currentSemester), where("date", "==", today));
+                console.log(`[Today Attendance] Fetching for public dailyAttendance in semester ${currentSemester} with date: ${today}`);
+
+
+                const querySnapshot = await getDocs(q); // Use getDocs for a one-time fetch
+                dailyAttendanceRecords = [];
+                querySnapshot.forEach((doc) => {
+                    const record = { id: doc.id, ...doc.data() };
+                    // Ensure absentRollNos is an array, convert if needed (e.g., from an old string format)
+                    record.absentRollNos = Array.isArray(record.absentRollNos) ? record.absentRollNos : [];
+                    dailyAttendanceRecords.push(record);
+                });
+
+
+                // Sort dailyAttendanceRecords in JavaScript after fetching
+                dailyAttendanceRecords.sort((a, b) => a.periodNo - b.periodNo);
+
+
+                todayAttendanceTableBody.innerHTML = ''; // Clear existing
+                if (dailyAttendanceRecords.length === 0) {
+                    todayAttendanceTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500">No attendance recorded for this date and semester.</td></tr>';
+                } else {
+                    dailyAttendanceRecords.forEach(record => {
+                        const row = todayAttendanceTableBody.insertRow();
+                        row.classList.add('hover:bg-gray-50');
+                        row.insertCell().textContent = record.date;
+                        row.insertCell().textContent = record.periodNo;
+                        row.insertCell().textContent = record.facultyName;
+                        row.insertCell().textContent = record.subjectName;
+                        row.insertCell().textContent = record.absentRollNos.join(', ') || 'None';
+                        row.insertCell().textContent = record.addedByEmail || record.addedByUid || 'Unknown';
+
+
+                        const actionsCell = row.insertCell();
+                        const editBtn = document.createElement('button');
+                        editBtn.textContent = 'Edit';
+                        editBtn.classList.add('bg-blue-500', 'hover:bg-blue-600', 'text-white', 'py-1', 'px-2', 'rounded-md', 'mr-2', 'text-sm');
+                        editBtn.onclick = () => showEditModal('dailyAttendance', record.id, {
+                            date: record.date,
+                            facultyName: record.facultyName,
+                            periodNo: record.periodNo,
+                            subjectName: record.subjectName,
+                            absentRollNos: record.absentRollNos.join(', ') // Convert array to string for textarea
+                        });
+                        actionsCell.appendChild(editBtn);
+
+
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.textContent = 'Delete';
+                        deleteBtn.classList.add('bg-red-500', 'hover:bg-red-600', 'text-white', 'py-1', 'px-2', 'rounded-md', 'text-sm');
+                        deleteBtn.onclick = () => showDeleteConfirm('dailyAttendance', record.id, `attendance for ${record.date}, Period ${record.periodNo}`);
+                        actionsCell.appendChild(deleteBtn);
+
+
+                        Array.from(row.cells).forEach(cell => cell.classList.add('py-2', 'px-4', 'border-b', 'border-gray-200'));
+                    });
+                }
+                console.log(`[Today Attendance] Daily attendance data for semester ${currentSemester} updated and sorted:`, dailyAttendanceRecords);
+            } catch (error) {
+                console.error("[Today Attendance Error] Error fetching today's attendance:", error);
+                todayAttendanceTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-500">Error loading attendance: ' + error.message + '</td></tr>';
+            }
+        }
+
+
+        // Listen for date input changes to refresh Today's Attendance table
+        attendanceDateInput.addEventListener('change', fetchAndDisplayTodayAttendance);
+
+
+        // Download Today's Attendance as CSV
+        downloadTodayAttendanceBtn.addEventListener('click', () => {
+            if (dailyAttendanceRecords.length === 0) {
+                showModal('No Data', 'No attendance recorded for today to download.');
+                return;
+            }
+
+
+            // Group by date (though for "today's" it's mostly one date)
+            const groupedAttendance = dailyAttendanceRecords.reduce((acc, record) => {
+                const date = record.date;
+                if (!acc[date]) acc[date] = [];
+                acc[date].push(record);
+                return acc;
+            }, {});
+
+
+            let csvContent = "";
+            for (const date in groupedAttendance) {
+                csvContent += `Date: ${date}\n`;
+                csvContent += "Period No.,Faculty Name,Subject Name,Absent Roll Nos.,Added By\n";
+                groupedAttendance[date].forEach(record => {
+                    const absentees = record.absentRollNos.join(';'); // Use semicolon to separate roll nos in CSV cell
+                    csvContent += `${record.periodNo},"${record.facultyName.replace(/"/g, '""')}","${record.subjectName.replace(/"/g, '""')}","${absentees.replace(/"/g, '""')}", "${(record.addedByEmail || record.addedByUid || 'Unknown').replace(/"/g, '""')}"\n`;
+                });
+                csvContent += "\n"; // Add a blank line between dates for clarity
+            }
+            downloadCSV(csvContent, `attendance_report_${attendanceDateInput.value}_sem${currentSemester}.csv`);
+        });
+
+
+        // --- Forenoon Present, Afternoon Absent Mismatch Report ---
+        generateMismatchReportBtn.addEventListener('click', generateForenoonAfternoonMismatchReport);
+
+
+        async function generateForenoonAfternoonMismatchReport() {
+            const selectedDate = attendanceDateInput.value;
+            if (!selectedDate) {
+                showModal('Error', 'Please select a date first.');
+                return;
+            }
+
+
+            if (!auth.currentUser) {
+                showModal('Error', 'Please log in to generate reports.');
+                return;
+            }
+
+
+            mismatchReportMessage.innerHTML = '<div class="loader mr-2"></div>Generating mismatch report...';
+            forenoonAfternoonMismatchOutput.classList.remove('hidden');
+            mismatchReportTableBody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-gray-500">Calculating...</td></tr>';
+            downloadMismatchReportBtn.disabled = true;
+            mismatchStudentsList = []; // Clear previous list
+
+
+            try {
+                // Fetch all attendance records for the selected date and current semester
+                const colRef = getCollectionRef('dailyAttendance');
+                if (!colRef) return; // Should already be logged in here due to check above
+
+
+                // Data will be filtered and sorted client-side
+                const q = query(colRef, where("semester", "==", currentSemester), where("date", "==", selectedDate));
+                const querySnapshot = await getDocs(q);
+                const dailyRecordsForDate = [];
+                querySnapshot.forEach(doc => dailyRecordsForDate.push(doc.data()));
+
+
+                if (dailyRecordsForDate.length === 0) {
+                    mismatchReportMessage.textContent = 'No attendance records found for this date. Cannot generate mismatch report.';
+                    mismatchReportTableBody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-gray-500">No data.</td></tr>';
+                    mismatchReportMessage.classList.remove('text-green-600', 'text-red-600');
+                    mismatchReportMessage.classList.add('text-yellow-600');
+                    return;
+                }
+
+
+                // Ensure we have current students data for the active semester
+                if (studentsData.length === 0) {
+                    mismatchReportMessage.textContent = 'No student data available for this semester to generate report. Please add students first.';
+                    mismatchReportTableBody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-gray-500">No student data.</td></tr>';
+                    mismatchReportMessage.classList.remove('text-green-600', 'text-red-600');
+                    mismatchReportMessage.classList.add('text-yellow-600');
+                    return;
+                }
+
+
+                const forenoonPresentStudents = new Set();
+                const afternoonPresentStudents = new Set();
+                let afternoonAttendanceRecorded = false; // Flag to check if ANY afternoon attendance was taken for ANY student
+
+
+                dailyRecordsForDate.forEach(record => {
+                    const periodNo = record.periodNo;
+                    const absentRollNos = Array.isArray(record.absentRollNos) ? record.absentRollNos : [];
+
+
+                    if (FORENOON_PERIODS.includes(periodNo)) {
+                        studentsData.forEach(student => {
+                            if (!absentRollNos.includes(student.rollNo)) {
+                                forenoonPresentStudents.add(student.rollNo);
+                            }
+                        });
+                    } else if (AFTERNOON_PERIODS.includes(periodNo)) {
+                        afternoonAttendanceRecorded = true; // At least one afternoon period was recorded
+                        studentsData.forEach(student => {
+                            if (!absentRollNos.includes(student.rollNo)) {
+                                afternoonPresentStudents.add(student.rollNo);
+                            }
+                        });
+                    }
+                });
+
+
+                // Logic: A student is a mismatch if they were present in forenoon
+                // AND they were NOT present in any afternoon period for which attendance was taken (meaning they were absent).
+                // AND at least one afternoon period's attendance was recorded.
+                if (afternoonAttendanceRecorded) {
+                    studentsData.forEach(student => {
+                        const rollNo = student.rollNo;
+                        const wasPresentForenoon = forenoonPresentStudents.has(rollNo);
+                        const wasPresentAfternoon = afternoonPresentStudents.has(rollNo);
+
+
+                        if (wasPresentForenoon && !wasPresentAfternoon) {
+                            mismatchStudentsList.push(student);
+                        }
+                    });
+                } else {
+                    mismatchReportMessage.textContent = 'No afternoon attendance records found for this date. Cannot generate mismatch report.';
+                    mismatchReportTableBody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-gray-500">No afternoon attendance data to compare.</td></tr>';
+                    downloadMismatchReportBtn.disabled = true;
+                    mismatchReportMessage.classList.remove('text-green-600', 'text-red-600');
+                    mismatchReportMessage.classList.add('text-yellow-600');
+                    return;
+                }
+
+
+
+
+                // Sort by roll number
+                mismatchStudentsList.sort((a, b) => a.rollNo.localeCompare(b.rollNo));
+
+
+                mismatchReportTableBody.innerHTML = '';
+                if (mismatchStudentsList.length === 0) {
+                    mismatchReportTableBody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-gray-500">No forenoon present, afternoon absent students found for this date.</td></tr>';
+                    mismatchReportMessage.textContent = 'Report generated: No mismatches found.';
+                    downloadMismatchReportBtn.disabled = true;
+                } else {
+                    mismatchStudentsList.forEach(student => {
+                        const row = mismatchReportTableBody.insertRow();
+                        row.insertCell().textContent = student.rollNo;
+                        row.insertCell().textContent = student.name;
+                        Array.from(row.cells).forEach(cell => cell.classList.add('py-2', 'px-4', 'border-b', 'border-gray-200'));
+                    });
+                    mismatchReportMessage.textContent = `Report generated: Found ${mismatchStudentsList.length} students.`;
+                    downloadMismatchReportBtn.disabled = false;
+                }
+                mismatchReportMessage.classList.remove('text-red-600', 'text-yellow-600');
+                mismatchReportMessage.classList.add('text-green-600');
+
+
+            } catch (error) {
+                console.error("[Mismatch Report Error]", error);
+                mismatchReportMessage.textContent = `Error generating report: ${error.message}`;
+                mismatchReportMessage.classList.add('text-red-600');
+                mismatchReportTableBody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-red-500">Error loading report.</td></tr>';
+                downloadMismatchReportBtn.disabled = true;
+            }
+        }
+
+
+        downloadMismatchReportBtn.addEventListener('click', () => {
+            if (mismatchStudentsList.length === 0) {
+                showModal('No Data', 'No mismatch student data to download.');
+                return;
+            }
+            let csvContent = "Roll No.,Name\n";
+            mismatchStudentsList.forEach(student => {
+                csvContent += `${student.rollNo},"${student.name.replace(/"/g, '""')}"\n`;
+            });
+            downloadCSV(csvContent, `mismatch_attendance_report_${attendanceDateInput.value}_sem${currentSemester}.csv`);
+        });
+
+
+        // --- Monthly Report Management ---
+        generateMonthlyReportBtn.addEventListener('click', async () => {
+            const selectedMonthYear = reportMonthInput.value; // e.g., "2023-11"
+            if (!selectedMonthYear) {
+                reportMessage.textContent = 'Please select a month.';
+                reportMessage.classList.add('text-red-600');
+                return;
+            }
+            reportMessage.innerHTML = '<div class="loader mr-2"></div>Generating report...';
+            reportMessage.classList.remove('text-green-600', 'text-red-600');
+            reportMessage.classList.add('text-gray-600'); // Neutral color while loading
+            monthlyReportTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500"><div class="loader mr-2"></div>Calculating...</td></tr>';
+            reportInsightsOutput.classList.add('hidden'); // Hide previous insights
+            reportInsightsOutput.textContent = ''; // Clear previous insights
+
+
+            if (!auth.currentUser) {
+                console.warn("[Monthly Report] Authentication not ready for report generation.");
+                reportMessage.textContent = 'Authentication required to generate report.';
+                reportMessage.classList.add('text-red-600');
+                monthlyReportTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Authentication error.</td></tr>';
+                return;
+            }
+
+
+            try {
+                const [year, month] = selectedMonthYear.split('-');
+                const startDate = new Date(parseInt(year), parseInt(month) - 1, 1); // Month is 0-indexed
+                const endDate = new Date(parseInt(year), parseInt(month), 0); // Last day of the month
+
+
+                // Fetch all daily attendance for the selected month from public collection and current semester
+                const colRef = getCollectionRef('dailyAttendance');
+                if (!colRef) return; // Should already be logged in here due to check above
+
+
+                // For simplicity given prompt constraints and avoiding index issues, we will fetch all and filter in memory
+                // If this were a production app, more complex date range queries would be used with proper indexing.
+                console.log(`[Monthly Report] Fetching all daily attendance for public dailyAttendance in semester ${currentSemester}`);
+                // MODIFIED: Removed orderBy from here to avoid composite index requirement
+                const allAttendanceSnapshot = await getDocs(colRef);
+                const monthlyAttendance = [];
+                allAttendanceSnapshot.forEach(doc => {
+                    const record = doc.data();
+                    const recordDate = new Date(record.date); // Assuming date is stored as "YYYY-MM-DD"
+                    if (record.semester === currentSemester && recordDate >= startDate && recordDate <= endDate) {
+                        // Ensure absentRollNos is an array, convert if needed
+                        record.absentRollNos = Array.isArray(record.absentRollNos) ? record.absentRollNos : [];
+                        monthlyAttendance.push(record);
+                    }
+                });
+                console.log("[Monthly Report] Raw monthly attendance records fetched:", monthlyAttendance);
+
+
+                // Get all students (from the public studentsData cache for the current semester)
+                if (studentsData.length === 0) {
+                    reportMessage.textContent = 'No student data available for this semester to generate report. Please add students first.';
+                    reportMessage.classList.add('text-red-600');
+                    monthlyReportTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">No students found.</td></tr>';
+                    return;
+                }
+
+
+                // Calculate report
+                const report = {}; // { rollNo: { name: "...", totalPeriods: 0, attendedPeriods: 0 } }
+                studentsData.forEach(student => {
+                    report[student.rollNo] = {
+                        rollNo: student.rollNo, // Ensure rollNo is part of the object
+                        name: student.name,
+                        totalPeriods: 0,
+                        attendedPeriods: 0
+                    };
+                });
+                console.log("[Monthly Report] Initialized report structure:", report);
+
+
+
+
+                monthlyAttendance.forEach(record => {
+                    // Filter absentRollNos to only include those present in studentsData
+                    const validAbsentRollNos = record.absentRollNos.filter(absentRoll =>
+                        studentsData.some(student => student.rollNo === absentRoll)
+                    );
+                    console.log(`[Monthly Report] Processing record: ${record.date}, Period ${record.periodNo}, Absent: ${validAbsentRollNos.join(', ')}`);
+
+
+
+
+                    studentsData.forEach(student => {
+                        const studentRollNo = student.rollNo;
+                        if (report[studentRollNo]) {
+                            report[studentRollNo].totalPeriods++;
+                            if (!validAbsentRollNos.includes(studentRollNo)) { // Only count if not in valid absent list
+                                report[studentRollNo].attendedPeriods++;
+                            }
+                        }
+                    });
+                });
+                console.log("[Monthly Report] Final calculated report:", report);
+
+
+
+
+                // Populate monthly report table
+                monthlyReportTableBody.innerHTML = '';
+                let hasReportData = false;
+                const sortedReport = Object.values(report).sort((a, b) => a.rollNo.localeCompare(b.rollNo));
+
+
+                sortedReport.forEach(studentReport => {
+                    // Only display students who had at least one period recorded for the month
+                    if (studentReport.totalPeriods > 0) {
+                        hasReportData = true;
+                        const percentage = studentReport.totalPeriods > 0
+                            ? ((studentReport.attendedPeriods / studentReport.totalPeriods) * 100).toFixed(2)
+                            : 0;
+
+
+                        const row = monthlyReportTableBody.insertRow();
+                        row.classList.add('hover:bg-gray-50');
+                        row.insertCell().textContent = studentReport.rollNo;
+                        row.insertCell().textContent = studentReport.name;
+                        row.insertCell().textContent = studentReport.totalPeriods;
+                        row.insertCell().textContent = studentReport.attendedPeriods;
+                        row.insertCell().textContent = percentage;
+                        Array.from(row.cells).forEach(cell => cell.classList.add('py-2', 'px-4', 'border-b', 'border-gray-200'));
+                    }
+                });
+
+
+                if (!hasReportData) {
+                    monthlyReportTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">No attendance data for the selected month and semester.</td></tr>';
+                    reportMessage.textContent = 'Report generated. No attendance data found for this month and semester.';
+                    reportMessage.classList.add('text-yellow-600'); // Use yellow for info/warning
+                    reportMessage.classList.remove('text-gray-600');
+                } else {
+                    reportMessage.textContent = 'Report generated successfully!';
+                    reportMessage.classList.add('text-green-600');
+                    reportMessage.classList.remove('text-gray-600');
+                }
+                reportMessage.classList.remove('text-red-600');
+
+
+            } catch (error) {
+                console.error("[Monthly Report Error] Error generating monthly report:", error);
+                reportMessage.textContent = 'Error generating report. Please try again: ' + error.message;
+                reportMessage.classList.add('text-red-600');
+                reportMessage.classList.remove('text-gray-600');
+                monthlyReportTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Error loading report.</td></tr>';
+            }
+        });
+
+
+        // Download Monthly Report as CSV
+        downloadMonthlyReportBtn.addEventListener('click', () => {
+            if (monthlyReportTableBody.rows.length === 0 || monthlyReportTableBody.innerHTML.includes('No attendance data')) {
+                showModal('No Data', 'No report data to download. Please generate the report first.');
+                return;
+            }
+            const monthYear = reportMonthInput.value;
+
+
+            let csvContent = "Roll No.,Name,Total Periods,Attended Periods,Percentage (%)\n";
+            Array.from(monthlyReportTableBody.rows).forEach(row => {
+                const rowData = Array.from(row.cells).map(cell => `"${cell.textContent.replace(/"/g, '""')}"`).join(',');
+                csvContent += rowData + "\n";
+            });
+            downloadCSV(csvContent, `monthly_report_${monthYear}_sem${currentSemester}.csv`);
+        });
+
+
+        // --- LLM Integration for Report Insights ---
+        generateReportInsightsBtn.addEventListener('click', async () => {
+            const monthYear = reportMonthInput.value;
+            if (!monthYear || monthlyReportTableBody.rows.length === 0 || monthlyReportTableBody.innerHTML.includes('No attendance data')) {
+                showModal('No Report Generated', 'Please generate the monthly report first before generating insights.');
+                return;
+            }
+
+
+            reportInsightsOutput.classList.remove('hidden'); // Show the output div
+            reportInsightsOutput.innerHTML = '<p class="text-center text-gray-500"><div class="loader mr-2"></div>Generating insights... This may take a moment.</p>';
+
+
+            const reportData = [];
+            Array.from(monthlyReportTableBody.rows).forEach(row => {
+                const cells = Array.from(row.cells);
+                reportData.push({
+                    rollNo: cells[0].textContent,
+                    name: cells[1].textContent,
+                    totalPeriods: parseInt(cells[2].textContent),
+                    attendedPeriods: parseInt(cells[3].textContent),
+                    percentage: parseFloat(cells[4].textContent)
+                });
+            });
+
+
+            // Construct the prompt for the LLM
+            let prompt = `Analyze the following student attendance data for the month of ${monthYear} for Semester ${currentSemester}:\n\n`;
+            reportData.forEach(student => {
+                prompt += `Roll No: ${student.rollNo}, Name: ${student.name}, Attended: ${student.attendedPeriods} out of ${student.totalPeriods} periods, Percentage: ${student.percentage}%\n`;
+            });
+            prompt += `\nProvide a concise summary of the attendance trends. Highlight any students with significantly low attendance (e.g., below 75%), any students with perfect attendance, and overall observations for the class. Keep the summary professional and actionable.`;
+
+
+            try {
+                // Call the Gemini API
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // API key will be provided by the runtime
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+
+                console.log("[LLM Insights] Calling Gemini API with prompt:", prompt);
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    reportInsightsOutput.innerHTML = `<h4 class="text-lg font-semibold text-blue-700 mb-2">Attendance Insights:</h4><p>${text}</p>`;
+                    console.log("[LLM Insights] Gemini API response successful.");
+                } else {
+                    reportInsightsOutput.innerHTML = '<p class="text-red-500">Failed to generate insights. No content from LLM.</p>';
+                    console.error("[LLM Insights Error] LLM response structure unexpected:", result);
+                }
+            } catch (error) {
+                console.error("[LLM Insights Error] Error calling Gemini API:", error);
+                reportInsightsOutput.innerHTML = '<p class="text-red-500">Error generating insights. Please try again later.</p>';
+            }
+        });
+
+
+        // --- Announcements Management (Public Data, Semester-Specific Filter) ---
+        addAnnouncementForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = addAnnouncementForm.querySelector('#announcementTitle').value.trim();
+            const message = addAnnouncementForm.querySelector('#announcementMessage').value.trim();
+
+
+            if (title && message) {
+                await addData('announcements', { title: title, message: message }, addAnnouncementMessage);
+                addAnnouncementForm.reset();
+            } else {
+                addAnnouncementMessage.textContent = 'Please fill both Title and Message for the announcement.';
+                addAnnouncementMessage.classList.add('text-red-600');
+                setTimeout(() => addAnnouncementMessage.textContent = '', 5000);
+            }
+        });
+
+
+        // Real-time listener for Announcements (Public Data, Semester-Specific Filter)
+        function setupAnnouncementsListener() {
+            const announcementsColRef = getCollectionRef('announcements');
+            if (!announcementsColRef) {
+                announcementsFeed.innerHTML = '<p class="text-center py-4 text-gray-500">Log in to view your announcements.</p>';
+                return;
+            }
+            // Query for announcements in the current semester - NO ORDER BY
+            // Data will be sorted client-side.
+            const q = query(announcementsColRef, where("semester", "==", currentSemester));
+            console.log(`[Announcements Listener] Setting up listener for announcements in public collection for semester ${currentSemester}`);
+            onSnapshot(q, (snapshot) => {
+                announcementsData = []; // Clear previous data
+                snapshot.forEach((doc) => {
+                    const announcement = { id: doc.id, ...doc.data() };
+                    announcementsData.push(announcement);
+                });
+
+
+                // Sort announcementsData in JavaScript after fetching (latest first)
+                announcementsData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+
+                announcementsFeed.innerHTML = ''; // Clear existing announcements
+                if (announcementsData.length === 0) {
+                    announcementsFeed.innerHTML = '<p class="text-center py-4 text-gray-500">No announcements yet for this semester. Add one above!</p>';
+                }
+                announcementsData.forEach((announcement) => {
+                    const announcementDiv = document.createElement('div');
+                    announcementDiv.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-md', 'border', 'border-gray-100');
+                    announcementDiv.innerHTML = `
+                        <h4 class="font-semibold text-lg text-gray-800 mb-1">${escapeHTML(announcement.title)}</h4>
+                        <p class="text-gray-700 text-sm mb-2">${escapeHTML(announcement.message)}</p>
+                        <p class="text-gray-500 text-xs text-right">
+                            Posted by: ${announcement.addedByEmail || announcement.addedByUid || 'Unknown User'} on ${new Date(announcement.timestamp).toLocaleString()}
+                        </p>
+                        <div class="flex justify-end gap-2 mt-2">
+                            <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded-md text-sm"
+                                onclick="window.showEditModal('announcements', '${announcement.id}', {title: '${escapeHTML(announcement.title)}', message: '${escapeHTML(announcement.message)}'})">Edit</button>
+                            <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded-md text-sm"
+                                onclick="window.showDeleteConfirm('announcements', '${announcement.id}', 'announcement: ${escapeHTML(announcement.title)}')">Delete</button>
+                        </div>
+                    `;
+                    announcementsFeed.appendChild(announcementDiv);
+                });
+                console.log(`[Announcements Listener] Announcements data for semester ${currentSemester} updated and sorted:`, announcementsData);
+            }, (error) => {
+                console.error("[Announcements Listener Error] Error listening to announcements:", error);
+                announcementsFeed.innerHTML = '<p class="text-center py-4 text-red-500">Error loading announcements: ' + error.message + '</p>';
+            });
+        }
+
+
+
+
+        // --- Modals (Edit/Delete/Custom Alert/Confirmation) ---
+
+
+        /**
+         * Shows the generic edit modal with dynamic fields based on item data.
+         * @param {string} collectionName - The name of the Firestore collection.
+         * @param {string} docId - The ID of the document to edit.
+         * @param {Object} itemData - The data object of the item to pre-fill the form.
+         */
+        window.showEditModal = function(collectionName, docId, itemData) {
+            currentEditingItem = { collectionName, docId, itemData };
+            editModalTitle.textContent = `Edit ${collectionName.replace(/([A-Z])/g, ' $1').toLowerCase()}`; // Format title (e.g., "Edit students")
+            editModalContent.innerHTML = ''; // Clear previous fields
+
+
+            for (const key in itemData) {
+                if (itemData.hasOwnProperty(key)) {
+                    const label = document.createElement('label');
+                    label.textContent = `${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}:`;
+                    label.classList.add('block', 'text-gray-700', 'font-medium', 'mb-1');
+                    editModalContent.appendChild(label);
+
+
+                    let inputElement;
+                    if (key === 'message' || key === 'absentRollNos') { // For longer text
+                        inputElement = document.createElement('textarea');
+                        inputElement.rows = 3;
+                    } else if (key === 'date') { // For date input
+                        inputElement = document.createElement('input');
+                        inputElement.type = 'date';
+                    } else if (key === 'periodNo') { // For period number
+                        inputElement = document.createElement('select');
+                        for (let i = 1; i <= 6; i++) {
+                            const option = document.createElement('option');
+                            option.value = i.toString();
+                            option.textContent = i.toString();
+                            inputElement.appendChild(option);
+                        }
+                    } else if (key === 'facultyName') {
+                        inputElement = document.createElement('select');
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = "";
+                        defaultOption.textContent = "Select Faculty";
+                        inputElement.appendChild(defaultOption);
+                        facultyData.forEach(faculty => {
+                            const option = document.createElement('option');
+                            option.value = faculty.name;
+                            option.textContent = faculty.name;
+                            inputElement.appendChild(option);
+                        });
+                    } else if (key === 'subjectName') {
+                         inputElement = document.createElement('select');
+                         const defaultOption = document.createElement('option');
+                         defaultOption.value = "";
+                         defaultOption.textContent = "Select Subject";
+                         inputElement.appendChild(defaultOption);
+                         subjectsData.forEach(subject => {
+                            const option = document.createElement('option');
+                            option.value = subject.name;
+                            option.textContent = subject.name;
+                            inputElement.appendChild(option);
+                        });
+                    }
+                    else { // Default to text input
+                        inputElement = document.createElement('input');
+                        inputElement.type = 'text';
+                    }
+                    inputElement.id = `edit-${key}`;
+                    inputElement.value = itemData[key];
+                    inputElement.classList.add('w-full', 'px-4', 'py-2', 'border', 'border-gray-300', 'rounded-md', 'focus:ring-blue-500', 'focus:border-blue-500', 'mb-3');
+                    editModalContent.appendChild(inputElement);
+                }
+            }
+            editModal.classList.remove('hidden');
+        };
+
+
+        editModalCancelBtn.addEventListener('click', () => {
+            editModal.classList.add('hidden');
+            currentEditingItem = null;
+        });
+
+
+        editModalSaveBtn.addEventListener('click', async () => {
+            if (!currentEditingItem) return;
+
+
+            const updatedData = {};
+            for (const key in currentEditingItem.itemData) {
+                if (currentEditingItem.itemData.hasOwnProperty(key)) {
+                    const inputElement = document.getElementById(`edit-${key}`);
+                    if (inputElement) {
+                         let value = inputElement.value.trim();
+                        // Special handling for absentRollNos: convert string to array
+                        if (key === 'absentRollNos') {
+                            value = value ? value.split(',').map(r => r.trim().toUpperCase()).filter(r => r) : [];
+                        } else if (key === 'periodNo') { // Convert to number for periodNo
+                            value = parseInt(value);
+                        }
+                        updatedData[key] = value;
+                    }
+                }
+            }
+
+
+            const success = await updateData(currentEditingItem.collectionName, currentEditingItem.docId, updatedData);
+            if (success) {
+                editModal.classList.add('hidden');
+                currentEditingItem = null;
+                showModal('Success', 'Item updated successfully!');
+            }
+            // Error handling is inside updateData
+        });
+
+
+        /**
+         * Shows the delete confirmation modal.
+         * @param {string} collectionName - The name of the Firestore collection.
+         * @param {string} docId - The ID of the document to delete.
+         * @param {string} itemDescription - A user-friendly description of the item being deleted.
+         */
+        window.showDeleteConfirm = function(collectionName, docId, itemDescription) {
+            currentDeletingItem = { collectionName, docId };
+            deleteConfirmMessage.textContent = `Are you sure you want to delete "${itemDescription}"? This action cannot be undone.`;
+            deleteConfirmModal.classList.remove('hidden');
+        };
+
+
+        deleteModalCancelBtn.addEventListener('click', () => {
+            deleteConfirmModal.classList.add('hidden');
+            currentDeletingItem = null;
+        });
+
+
+        deleteModalConfirmBtn.addEventListener('click', async () => {
+            if (!currentDeletingItem) return;
+
+
+            const success = await deleteData(currentDeletingItem.collectionName, currentDeletingItem.docId);
+            if (success) {
+                deleteConfirmModal.classList.add('hidden');
+                currentDeletingItem = null;
+                showModal('Success', 'Item deleted successfully!');
+            }
+            // Error handling is inside deleteData
+        });
+
+
+
+
+        /**
+         * Shows a custom modal dialog (for general alerts).
+         * @param {string} title - The title of the modal.
+         * @param {string} message - The message content of the modal.
+         */
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            customModal.classList.remove('hidden');
+        }
+
+
+        modalCloseButton.addEventListener('click', () => {
+            customModal.classList.add('hidden');
+        });
+
+
+        /**
+         * Shows a generic confirmation modal.
+         * @param {string} title - The title for the confirmation modal.
+         * @param {string} message - The message for the confirmation modal.
+         * @returns {Promise<boolean>} Resolves true if confirmed, false if cancelled.
+         */
+        function showConfirmationModal(title, message) {
+            return new Promise((resolve) => {
+                confirmModalTitle.textContent = title;
+                confirmModalMessage.innerHTML = `<p>${message}</p><p class="warning-text mt-4">This action is irreversible!</p>`;
+                confirmationModal.classList.remove('hidden');
+
+
+                const confirmHandler = () => {
+                    confirmationModal.classList.add('hidden');
+                    confirmModalConfirmBtn.removeEventListener('click', confirmHandler);
+                    confirmModalCancelBtn.removeEventListener('click', cancelHandler);
+                    resolve(true);
+                };
+
+
+                const cancelHandler = () => {
+                    confirmationModal.classList.add('hidden');
+                    confirmModalConfirmBtn.removeEventListener('click', confirmHandler);
+                    confirmModalCancelBtn.removeEventListener('click', cancelHandler);
+                    resolve(false);
+                };
+
+
+                confirmModalConfirmBtn.addEventListener('click', confirmHandler);
+                confirmModalCancelBtn.addEventListener('click', cancelHandler);
+            });
+        }
+
+
+
+
+        // --- Edit Student Semester Modal Logic ---
+        editStudentSemesterBtn.addEventListener('click', () => {
+            if (studentsData.length === 0) {
+                showModal('No Students', `No students found in Semester ${currentSemester}. Add students first to use this feature.`);
+                return;
+            }
+            populateStudentSelectForSemesterEdit();
+            editStudentSemesterModal.classList.remove('hidden');
+            editStudentSemesterMessage.textContent = ''; // Clear message
+            targetSemesterSelect.value = ""; // Reset target semester
+        });
+
+
+        editStudentSemesterCancelBtn.addEventListener('click', () => {
+            editStudentSemesterModal.classList.add('hidden');
+            editStudentSemesterMessage.textContent = '';
+        });
+
+
+        function populateStudentSelectForSemesterEdit() {
+            selectStudentToEditSemester.innerHTML = '<option value="">-- Select a student --</option>';
+            // Use the studentsData cache for the current semester
+            studentsData.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id; // Store doc ID as value
+                option.textContent = `${student.rollNo} - ${student.name}`;
+                selectStudentToEditSemester.appendChild(option);
+            });
+
+
+            // Populate target semester dropdown (include 'passout')
+            targetSemesterSelect.innerHTML = '<option value="">-- Select target semester --</option>';
+            for (let i = 1; i <= 6; i++) {
+                const semesterValue = i.toString();
+                // Allow selection of any semester, even current, though it doesn't make sense to move to same sem
+                // if (semesterValue !== currentSemester) {
+                    const option = document.createElement('option');
+                    option.value = semesterValue;
+                    option.textContent = `Semester ${semesterValue}`;
+                    targetSemesterSelect.appendChild(option);
+                // }
+            }
+            const passoutOption = document.createElement('option');
+            passoutOption.value = 'passout';
+            passoutOption.textContent = 'Passout';
+            targetSemesterSelect.appendChild(passoutOption);
+        }
+
+
+        editStudentSemesterSaveBtn.addEventListener('click', async () => {
+            const studentDocId = selectStudentToEditSemester.value;
+            const targetNewSemester = targetSemesterSelect.value;
+            const selectedStudent = studentsData.find(s => s.id === studentDocId);
+
+
+            if (!studentDocId || !targetNewSemester) {
+                editStudentSemesterMessage.textContent = 'Please select both a student and a target semester.';
+                editStudentSemesterMessage.classList.add('text-red-600');
+                setTimeout(() => editStudentSemesterMessage.textContent = '', 5000);
+                return;
+            }
+            if (targetNewSemester === currentSemester && targetNewSemester !== 'passout') { // Allow moving to 'passout' from current semester
+                 editStudentSemesterMessage.textContent = 'Student is already in the selected target semester. No action taken.';
+                 editStudentSemesterMessage.classList.add('text-yellow-600');
+                 setTimeout(() => editStudentSemesterMessage.textContent = '', 5000);
+                 return;
+            }
+
+
+
+
+            editStudentSemesterMessage.innerHTML = '<div class="loader mr-2"></div>Moving student...';
+            editStudentSemesterMessage.classList.remove('text-red-600', 'text-green-600', 'text-yellow-600');
+            editStudentSemesterMessage.classList.add('text-gray-600');
+
+
+            // --- Global Promotion Logic Trigger ---
+            if (currentSemester === '1' && targetNewSemester === '2') {
+                const confirmGlobal = await showConfirmationModal(
+                    "Confirm Global Semester Promotion",
+                    `You are about to promote a student from Semester 1 to Semester 2. This action will trigger a **GLOBAL promotion for ALL students** in higher semesters for **your account**:
+                    <br>
+                    - All students in **Semester 5 will move to Semester 6.**
+                    - All students in **Semester 4 will move to Semester 5.**
+                    - All students in **Semester 3 will move to Semester 4.**
+                    - All students in **Semester 2 will move to Semester 3.**
+                    - All students in **Semester 6 will move to Passout.**
+                    <br>
+                    This is a major, irreversible operation. Are you absolutely SURE you want to proceed?`
+                );
+
+
+                if (!confirmGlobal) {
+                    editStudentSemesterMessage.textContent = 'Global promotion cancelled.';
+                    editStudentSemesterMessage.classList.add('text-yellow-600');
+                    setTimeout(() => editStudentSemesterMessage.textContent = '', 5000);
+                    return;
+                }
+
+
+                try {
+                    await runTransaction(db, async (transaction) => {
+                        console.log("[Global Promotion] Starting global semester promotion transaction.");
+                        const studentsRef = getCollectionRef('students');
+                        // const passoutRef = getCollectionRef('passout'); // No separate passout collection now, just a field
+
+
+                        if (!studentsRef) { // || !passoutRef
+                            throw new Error("Missing collection reference for students.");
+                        }
+
+
+                        // Order is crucial for cascade: S6 to Passout first, then S5 to S6, etc.
+                        // S6 to Passout (update semester field to 'passout')
+                        const s6StudentsQuery = query(studentsRef, where("semester", "==", "6"));
+                        const s6StudentsSnapshot = await transaction.get(s6StudentsQuery);
+                        s6StudentsSnapshot.forEach(docSnap => {
+                            const student = docSnap.data();
+                            transaction.update(docSnap.ref, { // Update the existing document in 'students' collection
+                                semester: 'passout',
+                                passoutDate: new Date().toISOString()
+                            });
+                        });
+                        if (!s6StudentsSnapshot.empty) {
+                             console.log(`[Global Promotion] ${s6StudentsSnapshot.size} students moved from S6 to Passout.`);
+                        } else {
+                            console.log("[Global Promotion] No S6 students to move to Passout.");
+                        }
+
+
+
+
+                        // Cascade from S5 down to S2
+                        for (let i = 5; i >= 2; i--) {
+                            const currentSem = i.toString();
+                            const nextSem = (i + 1).toString();
+                            const currentSemesterStudentsQuery = query(studentsRef, where("semester", "==", currentSem));
+                            const studentsToPromoteSnapshot = await transaction.get(currentSemesterStudentsQuery);
+
+
+                            if (!studentsToPromoteSnapshot.empty) {
+                                console.log(`[Global Promotion] Moving students from Semester ${currentSem} to Semester ${nextSem}...`);
+                                studentsToPromoteSnapshot.forEach(docSnap => {
+                                    // Update the existing document's semester field
+                                    transaction.update(docSnap.ref, { semester: nextSem });
+                                });
+                            } else {
+                                console.log(`[Global Promotion] No students in Semester ${currentSem} to move.`);
+                            }
+                        }
+
+
+                        // Finally, move the specific student from S1 to S2
+                        const s1StudentDocRef = getDocRef('students', studentDocId);
+                        const s1StudentDoc = await transaction.get(s1StudentDocRef);
+                        if (!s1StudentDoc.exists() || s1StudentDoc.data().semester !== '1') {
+                            throw new Error(`Selected student (ID: ${studentDocId}) not found in Semester 1 or already moved.`);
+                        }
+                        transaction.update(s1StudentDocRef, { semester: '2' });
+                        console.log(`[Global Promotion] Manual student (${s1StudentDoc.data().rollNo}) moved from S1 to S2.`);
+                    });
+
+
+                    editStudentSemesterModal.classList.add('hidden');
+                    showModal('Success', `Global semester promotion and student move completed successfully!`);
+                    console.log("[Global Promotion] Global promotion transaction completed successfully.");
+
+
+                } catch (error) {
+                    console.error("[Global Promotion Error]", error);
+                    editStudentSemesterMessage.textContent = `Global promotion failed: ${error.message}`;
+                    editStudentSemesterMessage.classList.add('text-red-600');
+                    showModal('Error', `Global promotion failed: ${error.message}`);
+                } finally {
+                    // Refresh current semester display in case the current view was S1
+                    refreshAllSemesterDependentData();
+                    setTimeout(() => editStudentSemesterMessage.textContent = '', 10000); // Longer display for critical errors
+                }
+
+
+            } else {
+                // --- Normal single student move (not triggering global cascade) ---
+                try {
+                    await runTransaction(db, async (transaction) => {
+                        const studentDocRef = getDocRef('students', studentDocId);
+                        const studentDoc = await transaction.get(studentDocRef);
+
+
+                        if (!studentDoc.exists()) {
+                            throw new Error("Student not found.");
+                        }
+
+
+                        const studentData = studentDoc.data();
+
+
+                        // Check if a student with the same roll number already exists in the TARGET semester (if not moving to passout)
+                        if (targetNewSemester !== 'passout') {
+                            const existingStudentsQuery = query(getCollectionRef('students'), where("rollNo", "==", studentData.rollNo), where("semester", "==", targetNewSemester));
+                            const existingStudentSnapshot = await transaction.get(existingStudentsQuery);
+                            if (!existingStudentSnapshot.empty) {
+                                throw new Error(`A student with Roll No. ${studentData.rollNo} already exists in Semester ${targetNewSemester}.`);
+                            }
+                        }
+
+
+                        // Update the existing document's semester field
+                        const updateFields = { semester: targetNewSemester };
+                        if (targetNewSemester === 'passout') {
+                            updateFields.passoutDate = new Date().toISOString(); // Add passoutDate for passout students
+                        } else if (studentData.passoutDate) {
+                            delete updateFields.passoutDate; // Remove passoutDate if moving out of passout
+                        }
+                        transaction.update(studentDocRef, updateFields);
+                    });
+
+
+                    editStudentSemesterModal.classList.add('hidden');
+                    showModal('Success', `Student "${selectedStudent.rollNo} - ${selectedStudent.name}" successfully moved to ${targetNewSemester === 'passout' ? 'Passout' : `Semester ${targetNewSemester}`}.`);
+                    console.log(`[Edit Semester] Individual student ${selectedStudent.rollNo} moved from Semester ${currentSemester} to ${targetNewSemester}.`);
+
+
+                } catch (error) {
+                    console.error("[Edit Student Semester Error]", error);
+                    editStudentSemesterMessage.textContent = `Failed to move student: ${error.message}`;
+                    editStudentSemesterMessage.classList.add('text-red-600');
+                    showModal('Error', `Failed to move student: ${error.message}`);
+                } finally {
+                    setTimeout(() => editStudentSemesterMessage.textContent = '', 8000);
+                }
+            }
+        });
+
+
+
+
+        // --- Utility Functions ---
+        /**
+         * Generic function to download data as a CSV file.
+         * @param {string} content - The CSV content string.
+         * @param {string} filename - The name of the file to download.
+         */
+        function downloadCSV(content, filename) {
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) { // Feature detection
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                showModal('Download Not Supported', 'Your browser does not support downloading files directly. Please try a different browser.');
+                console.log(content); // Log to console as fallback
+            }
+        }
+
+
+        /**
+         * Helper function to escape HTML for use in innerHTML.
+         * Prevents XSS vulnerabilities.
+         * @param {string} str - The string to escape.
+         * @returns {string} The escaped string.
+         */
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+
+
+
+        // --- Login Page Logic ---
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = loginEmailInput.value.trim(); // Trim whitespace
+            const password = loginPasswordInput.value.trim(); // Trim whitespace
+
+
+            loginMessage.textContent = 'Attempting login...';
+            loginMessage.classList.remove('text-red-600', 'text-green-600');
+            loginMessage.classList.add('text-gray-600'); // Neutral color while logging in
+
+
+            console.log("[Login] Attempting login for email:", email);
+
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                console.log("[Login] signInWithEmailAndPassword successful. User UID:", user.uid, "Email:", user.email);
+                // onAuthStateChanged listener will handle UI transition
+
+
+                loginMessage.textContent = 'Login successful! Redirecting...';
+                loginMessage.classList.add('text-green-600');
+                loginMessage.classList.remove('text-gray-600');
+                // The onAuthStateChanged will handle the rest.
+            } catch (error) {
+                console.error("[Login Error]", error.code, error.message);
+                let errorMessage = 'Login failed. ';
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    errorMessage += 'Invalid email or password.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage += 'Invalid email format.';
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage += 'Network error. Please check your internet connection.';
+                }
+                 else if (error.code === 'auth/too-many-requests') {
+                    errorMessage += 'Too many login attempts. Please try again later.';
+                }
+                else {
+                    errorMessage += `An unexpected error occurred: ${error.message}`;
+                }
+                loginMessage.textContent = errorMessage;
+                loginMessage.classList.add('text-red-600');
+                loginMessage.classList.remove('text-gray-600');
+                setTimeout(() => loginMessage.textContent = '', 8000); // Keep error message visible longer
+            }
+        });
+    </script>
+</body>
+</html>
